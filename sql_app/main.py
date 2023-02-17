@@ -1,11 +1,17 @@
 from typing import List
+import sys, os
+
+import uvicorn as uvicorn
+
+sys.path.append(os.path.abspath('.'))
 
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
-from . import crud, models, schemas
-from .database import SessionLocal, engine
+import models, schemas, crud
+from sql_app.database import SessionLocal, engine
+from sql_app.schemas import Note
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -26,7 +32,8 @@ def get_db():
     finally:
         db.close()
 
-@app.post("/notes", response_model=schemas.Note, status_code=201)
+# @app.post("/notes", response_model=schemas.NoteResponse, status_code=201)
+@app.post("/notes", status_code=201)
 def create_note(note: schemas.NoteCreate, db: Session = Depends(get_db)):
     return crud.create_note(db=db, note=note)
 
@@ -59,3 +66,5 @@ async def patch_note(note_id: int, note: schemas.NoteCreate, db: Session = Depen
     db_note = schemas.Note(id = note_id, text = note.text)
     crud.update_note(db=db, note=db_note)
 
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)

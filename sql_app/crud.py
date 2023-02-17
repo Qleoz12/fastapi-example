@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 
-from . import models, schemas
+import models, schemas
 
 
 def get_note(db: Session, note_id: int):
@@ -13,7 +13,7 @@ def delete_note(db: Session, note_id: int):
     return {}
 
 def get_notes(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.Note).offset(skip).limit(limit).all()
+    return db.query(models.Note).order_by(models.Note.id).offset(skip).limit(limit).all()
 
 
 def create_note(db: Session, note: schemas.NoteCreate):
