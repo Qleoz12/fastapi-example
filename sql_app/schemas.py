@@ -3,16 +3,16 @@ from pydantic import BaseModel
 
 
 class NoteBase(BaseModel):
-    title: str
+    title: str =""
     text: str
 
 
 class NoteCreate(NoteBase):
     pass
 
-class Note(NoteBase):
+
+class Note(BaseModel):
     id: str
-    title:str
     text: str
 
     class Config:

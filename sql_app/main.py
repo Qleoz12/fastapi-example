@@ -32,6 +32,10 @@ def get_db():
     finally:
         db.close()
 
+@app.get("/")
+def read_root():
+    return {"Hello": "World"}
+
 # @app.post("/notes", response_model=schemas.NoteResponse, status_code=201)
 @app.post("/notes", status_code=201)
 def create_note(note: schemas.NoteCreate, db: Session = Depends(get_db)):
@@ -43,19 +47,19 @@ def read_notes(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     return notes
 
 @app.get("/notes/{note_id}", response_model=schemas.Note)
-def read_user(note_id: int, db: Session = Depends(get_db)):
+def read_user(note_id: str, db: Session = Depends(get_db)):
     db_note = crud.get_note(db=db, note_id=note_id)
     if db_note is None:
         raise HTTPException(status_code=404, detail="Note not found")
     return db_note
 
 @app.delete("/notes/{note_id}", status_code=204)
-async def delete_note(note_id: int, db: Session = Depends(get_db)):    
+async def delete_note(note_id: str, db: Session = Depends(get_db)):
     return crud.delete_note(db=db, note_id=note_id)
 
 
 @app.put("/notes/{note_id}", status_code=200)
-async def put_note(note_id: int, note: schemas.NoteCreate, db: Session = Depends(get_db)):
+async def put_note(note_id: str, note: schemas.NoteCreate, db: Session = Depends(get_db)):
     db_note = Note(id = note_id, text = note.text)
     crud.update_note(db=db, note=db_note)
 
